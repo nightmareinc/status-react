@@ -18,6 +18,7 @@
             [status-im.ui.screens.privacy-and-security-settings.views :as privacy-and-security]
             [status-im.ui.screens.language-settings.views :as language-settings]
             [status-im.ui.screens.notifications-settings.views :as notifications-settings]
+            [status-im.ui.screens.signing.views :as signing]
             [status-im.ui.screens.sync-settings.views :as sync-settings]
             [status-im.ui.screens.advanced-settings.views :as advanced-settings]
             [status-im.ui.screens.fleet-settings.views :as fleet-settings]
@@ -138,6 +139,7 @@
    :wallet-account                                   wallet.account/account
    :collectibles-list                                collectibles/collectibles-list
    :contact-code                                     [:modal wallet.components/contact-code]
+   :keycard-transaction-data                         [:modal signing/transaction-data]
    :wallet-transaction-details                       wallet-transactions/transaction-details
    :wallet-settings-assets                           wallet-settings/manage-assets
    :wallet-add-custom-token                          custom-tokens/add-custom-token

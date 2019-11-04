@@ -1407,6 +1407,31 @@
                 (when-not keycard-match?
                   (show-wrong-keycard-alert card-connected?))))))
 
+(fx/defn sign-typed-data
+  {:events [:hardwallet/sign-typed-data]}
+  [{:keys [db] :as cofx}]
+  (let [card-connected? (get-in db [:hardwallet :card-connected?])
+        hash (get-in db [:hardwallet :hash])
+        _ (log/info ":hardwallet/sign-typed-data" hash "card-connected?" card-connected?)]
+    (if card-connected?
+      {:db                      (-> db
+                                    (assoc-in [:hardwallet :card-read-in-progress?] true)
+                                    (assoc-in [:signing/sign :keycard-step] :signing))
+       :hardwallet/sign-typed-data {:hash (ethereum/naked-address hash)}}
+      (fx/merge cofx
+                (set-on-card-connected :hardwallet/sign-typed-data)
+                {:db (assoc-in db [:signing/sign :keycard-step] :signing)}
+                #_(navigation/navigate-to-cofx :hardwallet-connect nil)))))
+
+(fx/defn store-hash-and-sign-typed
+  {:events [:hardwallet/store-hash-and-sign-typed]}
+  [{:keys [db] :as cofx} result]
+  (log/info "# IN store-hash-and-sign-typed")
+  (let [{:keys [result error]} (types/json->clj result)]
+    (fx/merge cofx
+              {:db (assoc-in db [:hardwallet :hash] result)}
+              sign-typed-data)))
+
 (fx/defn prepare-to-sign
   {:events [:hardwallet/prepare-to-sign]}
   [{:keys [db] :as cofx}]
@@ -2026,7 +2051,7 @@
 (fx/defn on-sign-success
   {:events [:hardwallet.callback/on-sign-success]}
   [{:keys [db] :as cofx} signature]
-  (log/debug "[hardwallet] sign success: " signature)
+  (log/info "[hardwallet] sign success: " signature)
   (let [transaction (get-in db [:hardwallet :transaction])
         tx-obj (select-keys transaction [:from :to :value :gas :gasPrice])]
     (fx/merge cofx
@@ -2034,7 +2059,8 @@
                        (assoc-in [:hardwallet :pin :sign] [])
                        (assoc-in [:hardwallet :pin :status] nil)
                        (assoc-in [:hardwallet :hash] nil)
-                       (assoc-in [:hardwallet :transaction] nil))}
+                       (assoc-in [:hardwallet :transaction] nil)
+                       (assoc-in [:signing/sign :keycard-step] :success))}
               (clear-on-card-connected)
               (get-application-info (get-pairing db) nil)
               (if transaction
@@ -2046,17 +2072,21 @@
 (fx/defn on-sign-error
   [{:keys [db] :as cofx} error]
   (log/debug "[hardwallet] sign error: " error)
-  (let [tag-was-lost? (= "Tag was lost." (:error error))]
+  (let [tag-was-lost? (= "Tag was lost." (:error error))
+        pinless? (= :pinless (get-in db [:signing/sign :type]))
+        #_(= status-im.constants/web3-keycard-sign-typed-data
+             (get-in db [:navigation/screen-params :wallet-sign-message-modal :method]))]
     (fx/merge cofx
               (when tag-was-lost?
                 (fn [{:keys [db] :as cofx}]
                   (fx/merge cofx
                             {:db             (-> db
                                                  (assoc-in [:hardwallet :pin :status] nil)
-                                                 (assoc-in [:signing/sign :keycard-step] :connect))
+                                                 (assoc-in [:signing/sign :keycard-step] (when pinless? :error :connect)))
                              :utils/show-popup {:title   (i18n/label :t/error)
                                                 :content (i18n/label :t/cannot-read-card)}}
-                            (set-on-card-connected :hardwallet/prepare-to-sign))))
+                            (set-on-card-connected (if pinless? :hardwallet/sign-typed-data
+                                                       :hardwallet/prepare-to-sign)))))
               (if (re-matches pin-mismatch-error (:error error))
                 (fn [{:keys [db] :as cofx}]
                   (fx/merge cofx

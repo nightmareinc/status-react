@@ -12,6 +12,7 @@
                      :account-added
                      :account-settings
                      :collectibles-list
+                     :keycard-transaction-data
                      :wallet-onboarding-setup
                      :wallet-transaction-details
                      :wallet-settings-hook

@@ -327,9 +327,12 @@
         (when (or (not message?) (and address data))
           (signing/sign cofx (merge
                               (if message?
-                                {:message {:address address :data data :typed? (not= constants/web3-personal-sign method)
-                                           :from    dapps-address}}
-                                {:tx-obj (update (first params) :from #(or % dapps-address))})
+                                {:message {:address address
+                                           :data data
+                                           :typed? (not= constants/web3-personal-sign method)
+                                           :pinless? (= method constants/web3-keycard-sign-typed-data)
+                                           :from dapps-address}}
+                                {:tx-obj  (update (first params) :from #(or % dapps-address))})
                               {:on-result [:browser.dapp/transaction-on-result message-id id]
                                :on-error  [:browser.dapp/transaction-on-error message-id]}))))
       (if (#{"eth_accounts" "eth_coinbase"} method)
@@ -345,10 +348,20 @@
                                                   :error     %1
                                                   :result    %2}])]}))))
 
+(fx/defn testSignTypedData
+  {:events [:browser.ui/test-sign-typed-data]}
+  [cofx]
+  (log/info "#testSignTypedData")
+  (web3-send-async cofx {:method "keycard_signTypedData"
+                         :params ["0x111d500fe567696D0224A7292D47AF11e8A4bCB4" "{\"types\":{\"EIP712Domain\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"version\",\"type\":\"string\"},{\"name\":\"chainId\",\"type\":\"uint256\"},{\"name\":\"verifyingContract\",\"type\":\"address\"}],\"Person\":[{\"name\":\"name\",\"type\":\"string\"},{\"name\":\"wallet\",\"type\":\"address\"}],\"Mail\":[{\"name\":\"from\",\"type\":\"Person\"},{\"name\":\"to\",\"type\":\"Person\"},{\"name\":\"contents\",\"type\":\"string\"}]},\"primaryType\":\"Mail\",\"domain\":{\"name\":\"Ether Mail\",\"version\":\"1\",\"chainId\":1,\"verifyingContract\":\"0xCcCCccccCCCCcCCCCCCcCcCccCcCCCcCcccccccC\"},\"message\":{\"from\":{\"name\":\"Cow\",\"wallet\":\"0xCD2a3d9F938E13CD947Ec05AbC7FE734Df8DD826\"},\"to\":{\"name\":\"Bob\",\"wallet\":\"0xbBbBBBBbbBBBbbbBbbBbbbbBBbBbbbbBbBbbBBbB\"},\"contents\":\"Hello, Bob!\"}}"]
+                         :id "jkll"}
+                   "abcdefgh"))
+
 (fx/defn web3-send-async-read-only
   [{:keys [db] :as cofx} dapp-name {:keys [method] :as payload} message-id]
   (let [{:dapps/keys [permissions]} db]
     (if (and (#{"eth_accounts" "eth_coinbase" "eth_sendTransaction" "eth_sign"
+                "keycard_signTypedData"
                 "eth_signTypedData" "personal_sign" "personal_ecRecover"} method)
              (not (some #{constants/dapp-permission-web3} (get-in permissions [dapp-name :permissions]))))
       (send-to-bridge cofx

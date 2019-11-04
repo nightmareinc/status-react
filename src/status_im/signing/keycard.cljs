@@ -1,6 +1,7 @@
 (ns status-im.signing.keycard
   (:require [re-frame.core :as re-frame]
             [status-im.utils.fx :as fx]
+            [taoensso.timbre :as log]
             [status-im.native-module.core :as status]
             [status-im.utils.types :as types]
             [status-im.ethereum.abi-spec :as abi-spec]
@@ -35,12 +36,13 @@
       (assoc :nonce nonce))))
 
 (fx/defn hash-message
-  [_ {:keys [data typed?]}]
+  [_ {:keys [data typed?]} callback-event]
+  (log/info "# IN signing.keycard/hash-message data:" data "typed?:" typed? "callback-event:" [(or callback-event :signing.keycard.callback/hash-message-completed)])
   (if typed?
     {::hash-typed-data {:data         data
-                        :on-completed #(re-frame/dispatch [:signing.keycard.callback/hash-message-completed %])}}
+                        :on-completed #(re-frame/dispatch [(or callback-event :signing.keycard.callback/hash-message-completed) %])}}
     {::hash-message {:message      (ethereum/naked-address data)
-                     :on-completed #(re-frame/dispatch [:signing.keycard.callback/hash-message-completed %])}}))
+                     :on-completed #(re-frame/dispatch [(or callback-event :signing.keycard.callback/hash-message-completed) %])}}))
 
 (fx/defn hash-message-completed
   {:events [:signing.keycard.callback/hash-message-completed]}
@@ -65,12 +67,18 @@
 (fx/defn sign-with-keycard
   {:events [:signing.ui/sign-with-keycard-pressed]}
   [{:keys [db] :as cofx}]
-  (let [message (get-in db [:signing/tx :message])]
+  (let [message (get-in db [:signing/tx :message])
+        pinless? (:pinless? message)]
     (fx/merge cofx
               {:db (-> db
                        (assoc-in [:hardwallet :pin :enter-step] :sign)
                        (assoc-in [:signing/sign :keycard-step] :pin)
-                       (assoc-in [:signing/sign :type] :keycard))}
+                     ;; TODO is this needed? [:signing/sign :type] should be already set
+                     ;; in signing.core/show-sign
+                     ;:always
+                       #_(assoc-in [:signing/sign :type] (if pinless? :pinless :keycard)))}
+              #_(when pinless?
+                  (set-on-card-connected :hardwallet/sign-typed-data))
               (if message
-                (hash-message message)
+                (hash-message message nil)
                 (hash-transaction)))))

@@ -70,6 +70,14 @@
         (then #(re-frame/dispatch [:hardwallet.callback/on-install-applet-success %]))
         (catch #(re-frame/dispatch [:hardwallet.callback/on-install-applet-error (error-object->map %)])))))
 
+(defn install-cash-applet []
+  (log/debug "[keycard] install-applet")
+  (when config/hardwallet-enabled?
+    (.. keycard
+        installCashApplet
+        (then #(re-frame/dispatch [:hardwallet.callback/on-install-applet-success %]))
+        (catch #(re-frame/dispatch [:hardwallet.callback/on-install-applet-error (error-object->map %)])))))
+
 (defn init-card [pin]
   (log/debug "[keycard] init-card")
   (when config/hardwallet-enabled?
@@ -205,5 +213,13 @@
   (when (and pairing pin hash)
     (.. keycard
         (sign pairing pin hash)
+        (then #(re-frame/dispatch [:hardwallet.callback/on-sign-success %]))
+        (catch #(re-frame/dispatch [:hardwallet.callback/on-sign-error (error-object->map %)])))))
+
+(defn sign-typed-data
+  [{:keys [hash]}]
+  (when hash
+    (.. keycard
+        (signPinless hash)
         (then #(re-frame/dispatch [:hardwallet.callback/on-sign-success %]))
         (catch #(re-frame/dispatch [:hardwallet.callback/on-sign-error (error-object->map %)])))))

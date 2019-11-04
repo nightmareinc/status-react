@@ -2,12 +2,14 @@
   (:require [clojure.string :as string]
             [re-frame.core :as re-frame]
             [status-im.constants :as constants]
+            [taoensso.timbre :as log]
             [status-im.ethereum.abi-spec :as abi-spec]
             [status-im.ethereum.json-rpc :as json-rpc]
             [status-im.ethereum.core :as ethereum]
             [status-im.ethereum.eip55 :as eip55]
             [status-im.ethereum.tokens :as tokens]
             [status-im.i18n :as i18n]
+            [status-im.signing.keycard :as signing.keycard]
             [status-im.native-module.core :as status]
             [status-im.utils.fx :as fx]
             [status-im.utils.hex :as utils.hex]
@@ -171,17 +173,23 @@
 
 (fx/defn show-sign [{:keys [db] :as cofx}]
   (let [{:signing/keys [queue]} db
-        {{:keys [gas gasPrice] :as tx-obj} :tx-obj {:keys [data typed?] :as message} :message :as tx} (last queue)
+        {{:keys [gas gasPrice] :as tx-obj} :tx-obj {:keys [data typed? pinless?] :as message} :message :as tx} (last queue)
         keycard-multiaccount? (boolean (get-in db [:multiaccount :keycard-pairing]))
         wallet-set-up-passed? (get-in db [:multiaccount :wallet-set-up-passed?])
         updated-db (if wallet-set-up-passed? db (assoc db :popover/popover {:view :signing-phrase}))]
     (if message
-      {:db (assoc updated-db
-                  :signing/in-progress? true
-                  :signing/queue (drop-last queue)
-                  :signing/tx tx
-                  :signing/sign {:type           (if keycard-multiaccount? :keycard :password)
-                                 :formatted-data (if typed? (types/json->clj data) (ethereum/hex-to-utf8 data))})}
+      (fx/merge cofx
+                {:db (assoc updated-db
+                            :signing/in-progress? true
+                            :signing/queue (drop-last queue)
+                            :signing/tx tx
+                            :signing/sign {:type           (cond pinless? :pinless
+                                                                 keycard-multiaccount? :keycard
+                                                                 :else :password)
+                                           :formatted-data (if typed? (types/json->clj data) (ethereum/hex-to-utf8 data))
+                                           :keycard-step (when pinless? :connect)})}
+                (when pinless?
+                  (signing.keycard/hash-message message :hardwallet/store-hash-and-sign-typed)))
       (fx/merge cofx
                 {:db
                  (assoc updated-db
@@ -262,15 +270,28 @@
              (when on-error
                {:dispatch (conj on-error message)})))))
 
+(fx/defn dissoc-signing-db-entries
+  {:events [:signing/dissoc-entries]}
+  [{:keys [db] :as cofx}]
+  (log/info "# IN dissoc-signing-db-entries")
+  {:db (dissoc db :signing/tx :signing/in-progress? :signing/sign)})
+
 (fx/defn sign-message-completed
   {:events [:signing/sign-message-completed]}
   [{:keys [db] :as cofx} result]
   (let [{:keys [result error]} (types/json->clj result)
-        on-result (get-in db [:signing/tx :on-result])]
+        on-result (get-in db [:signing/tx :on-result])
+        _ (log/info "# IN signing.core/sign-message-completed result:" result "error:" error)]
     (if error
       {:db (update db :signing/sign assoc :error (i18n/label :t/wrong-password) :in-progress? false)}
       (fx/merge cofx
-                {:db (dissoc db :signing/tx :signing/in-progress? :signing/sign)}
+                (when-not (= (-> db :signing/sign :type) :pinless)
+                  dissoc-signing-db-entries)
+                #(when (= (-> db :signing/sign :type) :pinless)
+                   (do
+                     (log/info "# IN signing.core/sign-message-completed about to dispatch-later")
+                     {:dispatch-later [{:ms 3000
+                                        :dispatch [:signing/dissoc-entries]}]}))
                 (check-queue)
                 #(if on-result
                    {:dispatch (conj on-result result)})))))
