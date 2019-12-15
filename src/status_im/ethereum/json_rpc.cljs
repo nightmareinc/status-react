@@ -12,6 +12,8 @@
   {"eth_call" {}
    "eth_getBalance"
    {:on-result money/bignumber}
+   "eth_getTransactionCount"
+   {:on-result money/bignumber}
    "eth_estimateGas"
    {:on-result #(money/bignumber (int (* % 1.2)))}
    "eth_gasPrice"
