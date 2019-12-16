@@ -135,6 +135,41 @@
 
     (log/warn "method" method "not found" p)))
 
+(defn call-batch [requests on-success]
+  (let [prepared-requests
+        (reduce
+         (fn [{:keys [id requests methods-by-id]}
+              {:keys [method] :as request}]
+           {:requests (conj requests (merge
+                                      request
+                                      {:jsonrpc "2.0"
+                                       :id      id}))
+            :methods-by-id (assoc methods-by-id
+                                  id
+                                  method)
+            :id (inc id)})
+         {:requests []
+          :methods-by-id {} 
+          :id 1}
+         requests)]
+    (status/call-private-rpc
+     (types/clj->json
+      (:requests prepared-requests))
+     (fn [response]
+       (let [responses (types/json->clj response)]
+         (on-success
+          (mapv
+           (fn [{:keys [id error result]}]
+             (let [method-options (json-rpc-api
+                                   (get-in prepared-requests
+                                           [:methods-by-id id]))
+                   on-result (or (:on-result method-options)
+                                 identity)]
+               (if error
+                 {:error error}
+                 {:result (on-result result)})))
+           responses)))))))
+
 (defn eth-call
   [{:keys [contract method params outputs on-success on-error block]
     :or {block "latest"

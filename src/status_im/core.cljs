@@ -8,7 +8,8 @@
             status-im.transport.impl.send
             [status-im.react-native.js-dependencies :as js-dependencies]
             [status-im.utils.logging.core :as utils.logs]
-            cljs.core.specs.alpha))
+            cljs.core.specs.alpha
+            status-im.utils.scan))
 
 (if js/goog.DEBUG
   (.ignoreWarnings (.-YellowBox js-dependencies/react-native)
