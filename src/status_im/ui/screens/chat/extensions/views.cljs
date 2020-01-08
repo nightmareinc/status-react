@@ -8,8 +8,6 @@
             [status-im.ui.components.animation :as anim]
             [status-im.i18n :as i18n]))
 
-(def panel-height 264)
-
 (defn button [showing?]
   [react/touchable-highlight
    {:on-press            (fn [_]
@@ -30,11 +28,13 @@
                                :useNativeDriver true})])))
 
 (views/defview extensions-view []
-  (views/letsubs [bottom-anim-value (anim/create-value panel-height)
+  (views/letsubs [stickers-panel-height [:chats/stickers-panel-height]
+
+                  bottom-anim-value (anim/create-value @stickers-panel-height)
                   alpha-value       (anim/create-value 0)]
     {:component-did-mount #(show-panel-anim bottom-anim-value alpha-value)}
     [react/animated-view {:style {:background-color :white
-                                  :height    panel-height
+                                  :height    stickers-panel-height
                                   :transform [{:translateY bottom-anim-value}]
                                   :opacity   alpha-value}}
      [react/view {:style {:flex-direction :row}}
