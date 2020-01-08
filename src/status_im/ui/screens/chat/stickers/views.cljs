@@ -68,7 +68,7 @@
                             :font-size  17}}
         (i18n/label :t/recently-used-stickers)]])))
 
-(defn update-scroll-position [ref installed-packs selected-pack window-width]
+(defn update-scroll-position [ref installed-packs selected-pack window-width animated?]
   (when ref
     ;; bug on Android https://github.com/facebook/react-native/issues/24531
     (js/setTimeout
@@ -78,8 +78,8 @@
                  (* (inc (some #(when (= selected-pack (:id (second %))) (first %))
                                (map-indexed vector installed-packs)))
                     window-width))]
-         (.scrollTo ref #js {:x x :animated true})))
-     200)))
+         (.scrollTo ref #js {:x x :animated animated?})))
+     1)))
 
 (defn on-scroll [e installed-packs window-width]
   (let [num     (/ (.-nativeEvent.contentOffset.x e) window-width)
@@ -93,8 +93,8 @@
   (letsubs [ref   (atom nil)
             width [:dimensions/window-width]]
     {:component-will-update (fn [_ [_ installed-packs selected-pack]]
-                              (update-scroll-position @ref installed-packs selected-pack width))
-     :component-did-mount   #(update-scroll-position @ref installed-packs selected-pack width)}
+                              (update-scroll-position @ref installed-packs selected-pack width true))
+     :component-did-mount   #(update-scroll-position @ref installed-packs selected-pack width false)}
     [react/scroll-view {:style                             {:flex 1}
                         :horizontal                        true
                         :paging-enabled                    true
