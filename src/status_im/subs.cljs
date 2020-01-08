@@ -582,6 +582,26 @@
  (fn [ui-props [_ prop]]
    (get ui-props prop)))
 
+;; NOTE: The whole logic of stickers panel and input should be revised
+(re-frame/reg-sub
+ :chats/stickers-panel-height
+ :<- [:keyboard-max-height]
+ (fn [kb-height]
+   (cond
+     (and platform/iphone-x? (> kb-height 0))
+     (- kb-height tabs.styles/minimized-tabs-height 34)
+
+     platform/ios?
+     (+ kb-height (- (if (> kb-height 0)
+                       tabs.styles/minimized-tabs-height
+                       0)))
+
+     platform/iphone-x? 299
+
+     platform/ios? 258
+
+     :default 272)))
+
 (re-frame/reg-sub
  :chats/input-margin
  :<- [:keyboard-height]
