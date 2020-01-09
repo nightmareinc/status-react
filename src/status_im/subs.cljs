@@ -588,19 +588,17 @@
  :<- [:keyboard-max-height]
  (fn [kb-height]
    (cond
-     (and platform/iphone-x? (> kb-height 0))
+     (and platform/iphone-x? (pos? kb-height))
      (- kb-height tabs.styles/minimized-tabs-height 34)
 
-     platform/ios?
-     (+ kb-height (- (if (> kb-height 0)
-                       tabs.styles/minimized-tabs-height
-                       0)))
+     (pos? kb-height)
+     (- kb-height tabs.styles/minimized-tabs-height)
 
      platform/iphone-x? 299
 
      platform/ios? 258
 
-     :default 272)))
+     :else 272)))
 
 (re-frame/reg-sub
  :chats/input-margin
