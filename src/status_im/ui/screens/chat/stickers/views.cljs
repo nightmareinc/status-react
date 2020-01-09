@@ -130,7 +130,9 @@
 
 (defview scroll-indicator []
   (letsubs [window-width [:dimensions/window-width]]
-    [react/view {:style {:margin-bottom    5 :height 2 :width indicator-width :border-radius 1
+    [react/view {:style {:height           2
+                         :width            indicator-width
+                         :border-radius    1
                          :margin-left      (+ dx (* icon-container (/ @scroll-x window-width)))
                          :background-color colors/blue}}]))
 
