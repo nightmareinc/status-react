@@ -1205,12 +1205,23 @@
  :contact/qr-code-scanned
  [(re-frame/inject-cofx :random-id-generator)]
  (fn [{:keys [db] :as cofx} [_ contact-identity _]]
-   (let [validation-result (new-chat.db/validate-pub-key db contact-identity)]
-     (if (some? validation-result)
-       {:utils/show-popup {:title (i18n/label :t/unable-to-read-this-code)
-                           :content validation-result
+   (let [public-key?       (and (string? contact-identity)
+                                (string/starts-with? contact-identity "0x"))
+         validation-result (new-chat.db/validate-pub-key db contact-identity)]
+     (cond
+       (and public-key? (some? validation-result))
+       {:utils/show-popup {:title      (i18n/label :t/unable-to-read-this-code)
+                           :content    validation-result
                            :on-dismiss #(re-frame/dispatch [:navigate-to-clean :home])}}
-       (chat/start-chat cofx contact-identity {:navigation-reset? true})))))
+
+       (and public-key? (not (some? validation-result)))
+       (chat/start-chat cofx contact-identity {:navigation-reset? true})
+
+       :else
+       (let [chain (ethereum/chain-keyword db)]
+         {:resolve-public-key {:chain            chain
+                               :contact-identity contact-identity
+                               :cb               #(re-frame/dispatch [:contact/qr-code-scanned nil %])}})))))
 
 (handlers/register-handler-fx
  :contact.ui/start-group-chat-pressed
