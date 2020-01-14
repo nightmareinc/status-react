@@ -1216,7 +1216,7 @@
        (let [chain (ethereum/chain-keyword db)]
          {:resolve-public-key {:chain            chain
                                :contact-identity contact-identity
-                               :cb               #(re-frame/dispatch [:contact/qr-code-scanned nil %])}})
+                               :cb               #(re-frame/dispatch [:contact/qr-code-scanned %])}})
 
        :else
        {:utils/show-popup {:title      (i18n/label :t/unable-to-read-this-code)
