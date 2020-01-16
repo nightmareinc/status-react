@@ -1212,7 +1212,7 @@
        (and public-key? (not (some? validation-result)))
        (chat/start-chat cofx contact-identity {:navigation-reset? true})
 
-       (string? contact-identity)
+       (and (not public-key?) (string? contact-identity))
        (let [chain (ethereum/chain-keyword db)]
          {:resolve-public-key {:chain            chain
                                :contact-identity contact-identity
