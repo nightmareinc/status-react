@@ -111,6 +111,7 @@
    :keycard-recovery-success                         keycard.recovery/success
    :keycard-recovery-no-key                          keycard.recovery/no-key
    :keycard-recovery-pin                             keycard.recovery/pin
+   :keycard-transaction-data                         [:modal signing/transaction-data]
    :keycard-blank                                    keycard/blank
    :keycard-wrong                                    keycard/wrong
    :keycard-unpaired                                 keycard/unpaired
@@ -139,7 +140,6 @@
    :wallet-account                                   wallet.account/account
    :collectibles-list                                collectibles/collectibles-list
    :contact-code                                     [:modal wallet.components/contact-code]
-   :keycard-transaction-data                         [:modal signing/transaction-data]
    :wallet-transaction-details                       wallet-transactions/transaction-details
    :wallet-settings-assets                           wallet-settings/manage-assets
    :wallet-add-custom-token                          custom-tokens/add-custom-token

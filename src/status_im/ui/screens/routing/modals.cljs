@@ -5,6 +5,7 @@
    :stickers-pack-modal
    :tribute-learn-more
    :enter-pin-modal
+   :keycard-transaction-data
    :hardwallet-connect-modal
    :selection-modal-screen
    :wallet-transactions-filter

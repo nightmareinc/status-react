@@ -194,19 +194,37 @@
      [react/text {:style styles/sheet-subtitle} (i18n/label subtitle)]
      [button/button {:type :main
                      :disabled? (= keycard-step :success)
-                     ;:container-style {:margin-bottom 16}
+                     :label-style {:font-size 20}
+                     :style {:align-self :stretch}
+                     :container-style {:height 64}
                      :label (i18n/label :t/show-transaction-data)
                      :on-press #(re-frame/dispatch [:navigate-to :keycard-transaction-data])}]
      [button/button {:type :main
                      :theme :red
                      :disabled? (= keycard-step :success)
-                     :container-style {:margin-bottom 16}
+                     :container-style {:margin-top 8
+                                       :height 64 :margin-bottom 16}
+                     :style {:align-self :stretch}
+                     :label-style {:font-size 20}
                      :label (i18n/label :t/decline)
                      :on-press #(re-frame/dispatch [:signing.ui/cancel-is-pressed])}]]))
+
 (views/defview transaction-data []
   (views/letsubs [{:keys [formatted-data]} [:signing/sign]]
-    [react/view
-     [react/text {:style {:font-size 17}} formatted-data]]))
+    [react/view {:border-radius 16
+                 :padding 24
+                 :background-color colors/white}
+     [react/text {:style {:font-size 17 :font-weight "700"}}
+      (i18n/label :t/transaction-data)]
+     [react/view {:style {:margin-top 24}}
+      [react/text {:style {:font-size 17}} formatted-data]]
+     [separator]
+     [button/button  {:type :main
+                      :label-style {:font-size 20}
+                      :style {:align-self :stretch}
+                      :container-style {:height 64}
+                      :label (i18n/label :t/close)
+                      :on-press #(re-frame/dispatch [:navigate-back])}]]))
 
 (views/defview password-view [{:keys [type error in-progress? enabled?] :as sign}]
   (views/letsubs [phrase [:signing/phrase]]
