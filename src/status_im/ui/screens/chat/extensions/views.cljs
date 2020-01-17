@@ -28,13 +28,13 @@
                                :useNativeDriver true})])))
 
 (views/defview extensions-view []
-  (views/letsubs [stickers-panel-height [:chats/stickers-panel-height]
+  (views/letsubs [panel-height [:chats/chat-panel-height]
 
-                  bottom-anim-value (anim/create-value @stickers-panel-height)
+                  bottom-anim-value (anim/create-value @panel-height)
                   alpha-value       (anim/create-value 0)]
     {:component-did-mount #(show-panel-anim bottom-anim-value alpha-value)}
     [react/animated-view {:style {:background-color :white
-                                  :height    stickers-panel-height
+                                  :height    panel-height
                                   :transform [{:translateY bottom-anim-value}]
                                   :opacity   alpha-value}}
      [react/view {:style {:flex-direction :row}}

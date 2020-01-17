@@ -584,7 +584,7 @@
 
 ;; NOTE: The whole logic of stickers panel and input should be revised
 (re-frame/reg-sub
- :chats/stickers-panel-height
+ :chats/chat-panel-height
  :<- [:keyboard-max-height]
  (fn [kb-height]
    (cond
