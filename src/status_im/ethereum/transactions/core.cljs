@@ -132,8 +132,7 @@
   [{:keys [db] :as cofx} {:keys [hash id address] :as transfer}]
   (let [transfer-by-hash (get-in db [:wallet :accounts address :transactions hash])
         transfer-by-id   (get-in db [:wallet :accounts address :transactions id])]
-    (when-let [unique-id (when-not (or transfer-by-id
-                                       (= transfer transfer-by-hash))
+    (when-let [unique-id (when-not (= transfer transfer-by-hash)
                            (if (and transfer-by-hash
                                     (not (= :pending
                                             (:type transfer-by-hash))))
@@ -187,10 +186,6 @@
 (fx/defn new-transfers
   {:events [::new-transfers]}
   [{:keys [db] :as cofx} transfers {:keys [address historical? before-block]}]
-  (log/debug "ffobar"
-             (= before-block (get-in db [:wallet :accounts address :min-block]))
-             (count transfers)
-             (empty? transfers))
   (let [min-block (get-in db [:wallet :accounts address :min-block])
         effects (cond-> [(when (seq transfers)
                            (set-lowest-fetched-block address transfers))]
