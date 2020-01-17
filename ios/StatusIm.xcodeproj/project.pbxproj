@@ -89,10 +89,6 @@
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = StatusIm/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = StatusIm/main.m; sourceTree = "<group>"; };
 		1426DF592BA248FC81D955CB /* Inter-Regular.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Regular.otf"; path = "../resources/fonts/Inter-Regular.otf"; sourceTree = "<group>"; };
-		2028DFF51D4275B600227DCD /* SF-UI-Display-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Display-Medium.otf"; sourceTree = "<group>"; };
-		2028DFF61D4275B600227DCD /* SF-UI-Display-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Display-Regular.otf"; sourceTree = "<group>"; };
-		2028DFF71D4275B600227DCD /* SF-UI-Display-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Display-Semibold.otf"; sourceTree = "<group>"; };
-		2028DFF81D4275B600227DCD /* SF-UI-Display-Thin.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Display-Thin.otf"; sourceTree = "<group>"; };
 		38A44830EC5708E89387F641 /* Pods-StatusIm.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StatusIm.release.xcconfig"; path = "Pods/Target Support Files/Pods-StatusIm/Pods-StatusIm.release.xcconfig"; sourceTree = "<group>"; };
 		439B6B4B407A4E2AACAFE5BE /* RCTStatus.xcodeproj */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "wrapper.pb-project"; name = RCTStatus.xcodeproj; path = "../modules/react-native-status/ios/RCTStatus/RCTStatus.xcodeproj"; sourceTree = "<group>"; };
 		4C16DE0B1F89508700AA10DB /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
@@ -101,11 +97,7 @@
 		74B758FB20D7C00B003343C3 /* launch-image-universal.storyboard */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; path = "launch-image-universal.storyboard"; sourceTree = "<group>"; };
 		8B9A886A2CB448B1ABA0EB62 /* libc++.tbd */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = "libc++.tbd"; path = "usr/lib/libc++.tbd"; sourceTree = SDKROOT; };
 		922C4CA61F4D5F8B0033C753 /* StatusIm.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; name = StatusIm.entitlements; path = StatusIm/StatusIm.entitlements; sourceTree = "<group>"; };
-		9E0B01A01DDC5DA7002B0359 /* SF-UI-Text-Light.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Text-Light.otf"; sourceTree = "<group>"; };
 		9EC0135C1E06FB1900155B5C /* RCTWKWebView.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = RCTWKWebView.xcodeproj; path = "../node_modules/react-native-wkwebview-reborn/ios/RCTWKWebView.xcodeproj"; sourceTree = "<group>"; };
-		9ED2F45C1D9D52C100B36508 /* SF-UI-Text-Medium.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Text-Medium.otf"; sourceTree = "<group>"; };
-		9ED2F45D1D9D52DD00B36508 /* SF-UI-Text-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Text-Regular.otf"; sourceTree = "<group>"; };
-		9ED2F4601D9D577B00B36508 /* SF-UI-Text-Bold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Text-Bold.otf"; sourceTree = "<group>"; };
 		9EF083381F3B538A00876A8F /* ReactNativeConfig.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = ReactNativeConfig.xcodeproj; path = "../node_modules/react-native-config/ios/ReactNativeConfig.xcodeproj"; sourceTree = "<group>"; };
 		A4F2BBE8D4DD4140A6CCAC39 /* Inter-SemiBoldItalic.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-SemiBoldItalic.otf"; path = "../resources/fonts/Inter-SemiBoldItalic.otf"; sourceTree = "<group>"; };
 		ACA66A8F16CD2FE21F38738B /* Pods-StatusIm.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StatusIm.debug.xcconfig"; path = "Pods/Target Support Files/Pods-StatusIm/Pods-StatusIm.debug.xcconfig"; sourceTree = "<group>"; };
@@ -119,7 +111,6 @@
 		CD4A2C27D6D5473184DC1F7E /* Inter-Bold.otf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = 9; includeInIndex = 0; lastKnownFileType = unknown; name = "Inter-Bold.otf"; path = "../resources/fonts/Inter-Bold.otf"; sourceTree = "<group>"; };
 		CE4E31B21D8695250033ED64 /* Statusgo.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Statusgo.framework; path = "../modules/react-native-status/ios/RCTStatus/Statusgo.framework"; sourceTree = "<group>"; };
 		D489EE8D5F52DA10AC715727 /* Pods-StatusImTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-StatusImTests.release.xcconfig"; path = "Pods/Target Support Files/Pods-StatusImTests/Pods-StatusImTests.release.xcconfig"; sourceTree = "<group>"; };
-		F9238D6B1E5F055900C047B9 /* SF-UI-Text-Semibold.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "SF-UI-Text-Semibold.otf"; sourceTree = "<group>"; };
 		FC1CBCFE6C906043D6CCEEE1 /* libPods-StatusImTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-StatusImTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
@@ -185,7 +176,6 @@
 		1E7837547A9A40E18AD63CF3 /* Resources */ = {
 			isa = PBXGroup;
 			children = (
-				2028E0111D4275BD00227DCD /* SF */,
 				74B758FB20D7C00B003343C3 /* launch-image-universal.storyboard */,
 				CD4A2C27D6D5473184DC1F7E /* Inter-Bold.otf */,
 				B321D25F4493470980039457 /* Inter-BoldItalic.otf */,
@@ -205,22 +195,6 @@
 				201067C41D4789F700FA83B6 /* libRCTStatus.a */,
 			);
 			name = Products;
-			sourceTree = "<group>";
-		};
-		2028E0111D4275BD00227DCD /* SF */ = {
-			isa = PBXGroup;
-			children = (
-				F9238D6B1E5F055900C047B9 /* SF-UI-Text-Semibold.otf */,
-				9ED2F4601D9D577B00B36508 /* SF-UI-Text-Bold.otf */,
-				9E0B01A01DDC5DA7002B0359 /* SF-UI-Text-Light.otf */,
-				9ED2F45D1D9D52DD00B36508 /* SF-UI-Text-Regular.otf */,
-				9ED2F45C1D9D52C100B36508 /* SF-UI-Text-Medium.otf */,
-				2028DFF51D4275B600227DCD /* SF-UI-Display-Medium.otf */,
-				2028DFF61D4275B600227DCD /* SF-UI-Display-Regular.otf */,
-				2028DFF71D4275B600227DCD /* SF-UI-Display-Semibold.otf */,
-				2028DFF81D4275B600227DCD /* SF-UI-Display-Thin.otf */,
-			);
-			name = SF;
 			sourceTree = "<group>";
 		};
 		5C1C8762251D6EF495FB2384 /* Pods */ = {
