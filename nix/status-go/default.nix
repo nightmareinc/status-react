@@ -1,16 +1,18 @@
 { config, stdenv, callPackage, mkShell, mergeSh, buildGoPackage, go,
-  fetchFromGitHub, mkFilter, openjdk, androidPkgs, xcodeWrapper }:
+  fetchFromGitHub, mkFilter, openjdk, androidPkgs, xcodeWrapper, envFlags }:
 
 let
   inherit (stdenv.lib)
-    catAttrs concatStrings fileContents importJSON makeBinPath
+    catAttrs concatStrings concatStringsSep fileContents importJSON makeBinPath
     optional optionalString strings attrValues mapAttrs attrByPath
     traceValFn;
 
+  enableNimbus = (attrByPath ["STATUS_GO_ENABLE_NIMBUS"] "0" envFlags) != "0";
   utils = callPackage ./utils.nix { inherit xcodeWrapper; };
   gomobile = callPackage ./gomobile { inherit (androidPkgs) platform-tools; inherit xcodeWrapper utils buildGoPackage; };
+  nimbus = if enableNimbus then callPackage ./nimbus { } else { wrappers-android = { }; };
   buildStatusGoDesktopLib = callPackage ./build-desktop-status-go.nix { inherit buildGoPackage go xcodeWrapper utils; };
-  buildStatusGoMobileLib = callPackage ./build-mobile-status-go.nix { inherit buildGoPackage go gomobile xcodeWrapper utils; };
+  buildStatusGoMobileLib = callPackage ./build-mobile-status-go.nix { inherit buildGoPackage go gomobile xcodeWrapper utils androidPkgs; };
   srcData =
     # If config.status-im.status-go.src-override is defined, instruct Nix to use that path to build status-go
     if (attrByPath ["status-im" "status-go" "src-override"] "" config) != "" then rec {
@@ -51,21 +53,52 @@ let
       };
 
   mobileConfigs = {
-    android = {
+    android = rec {
       name = "android";
-      outputFileName = "status-go-${srcData.shortRev}.aar";
       envVars = [
         "ANDROID_HOME=${androidPkgs.androidsdk}/libexec/android-sdk"
         "ANDROID_NDK_HOME=${androidPkgs.ndk-bundle}/libexec/android-sdk/ndk-bundle"
         "PATH=${makeBinPath [ openjdk ]}:$PATH"
       ];
-      gomobileExtraFlags = [ "-androidapi 18" ];
+      gomobileExtraFlags = [ "-androidapi 23" ];
+      outputFileName = "status-go-${srcData.shortRev}.aar";
+      platforms = {
+        x86 = {
+          linkNimbus = enableNimbus;
+          nimbus = assert enableNimbus; nimbus.wrappers-android.x86;
+          gomobileTarget = "${name}/386";
+          outputFileName = "status-go-${srcData.shortRev}-386.aar";
+        };
+        arm64 = {
+          linkNimbus = enableNimbus;
+          nimbus = assert enableNimbus; nimbus.wrappers-android.arm64;
+          gomobileTarget = "${name}/arm64";
+          outputFileName = "status-go-${srcData.shortRev}-arm64.aar";
+        };
+      };
     };
-    ios = {
+    ios = rec {
       name = "ios";
-      outputFileName = "Statusgo.framework";
       envVars = [];
       gomobileExtraFlags = [ "-iosversion=8.0" ];
+      outputFileName = "Statusgo.framework";
+      platforms = {
+        ios = {
+          linkNimbus = enableNimbus;
+          nimbus = assert false; null; # TODO
+          gomobileTarget = name;
+          inherit outputFileName;
+        };
+      };
+      # platforms = {
+      #   x86 = {
+      #     nimbus = assert enableNimbus; nimbus.wrappers-ios.x86;
+      #     gomobileTarget = "${name}/386";
+      #   };
+      #   arm64 = {
+      #     nimbus = assert enableNimbus; nimbus.wrappers-ios.arm64;
+      #     gomobileTarget = "${name}/arm64";
+      # };
     };
   };
   hostConfigs = {
@@ -80,7 +113,7 @@ let
   };
   currentHostConfig = if stdenv.isDarwin then hostConfigs.darwin else hostConfigs.linux;
 
-  goBuildFlags = "-v";
+  goBuildFlags = concatStringsSep " " [ "-v" (optionalString enableNimbus "-tags='nimbus'") ];
   # status-go params to be set at build time, important for About section and metrics
   goBuildParams = {
     GitCommit = srcData.rev;

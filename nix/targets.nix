@@ -12,6 +12,7 @@ let
   status-go = callPackage ./status-go {
     inherit (mobile) xcodeWrapper;
     androidPkgs = mobile.android.androidComposition;
+    envFlags = callPackage ./tools/envParser.nix { };
   };
 
   desktop = callPackage ./desktop {
