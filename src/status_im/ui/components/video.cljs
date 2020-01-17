@@ -9,7 +9,7 @@
 
 (defn video [props]
   [react/view {:style (:style props)}
-   [video-player props]
+   [video-player (assoc props :hideShutterView true)]
    [react/view {:style {:position     :absolute
                         :top          0
                         :bottom       0
